@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content Hub</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --apple-blue: #0071e3;
+            --apple-blue-hover: #0077ED;
+            --apple-gray: #f5f5f7;
+            --text-primary: #1d1d1f;
+            --text-secondary: #6e6e73;
+            --border-color: #d2d2d7;
+            --white: #ffffff;
+            --sky-blue: #87CEEB;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+            background: var(--white);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            transition: background-color 0.5s ease;
+        }
+
+        body.sky-blue-mode {
+            background: var(--sky-blue);
+        }
+
+        /* Theme Toggle Button */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .theme-btn {
+            background: var(--sky-blue);
+            color: white;
+            border: 2px solid #6BB6D6;
+            padding: 12px 24px;
+            border-radius: 24px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(135, 206, 235, 0.3);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .theme-btn:hover {
+            background: #6BB6D6;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(135, 206, 235, 0.4);
+        }
+
+        .theme-btn:active {
+            transform: translateY(0);
+        }
+
+        body.sky-blue-mode .theme-btn {
+            background: var(--white);
+            color: var(--sky-blue);
+            border-color: var(--white);
+        }
+
+        body.sky-blue-mode .theme-btn:hover {
+            background: var(--apple-gray);
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 80px 20px 60px;
+            text-align: center;
+            transition: background 0.5s ease;
+        }
+
+        body.sky-blue-mode .hero {
+            background: linear-gradient(135deg, #87CEEB 0%, #6BB6D6 100%);
+        }
+
+        .featured-player {
+            max-width: 1400px;
+            margin: -30px auto 40px;
+            padding: 0 20px;
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .featured-player.active {
+            opacity: 1;
+            max-height: 800px;
+            margin-bottom: 60px;
+        }
+
+        .featured-container {
+            background: var(--white);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+            position: relative;
+            animation: slideDown 0.5s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .featured-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            font-size: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .featured-close:hover {
+            background: var(--apple-blue);
+            transform: rotate(90deg);
+        }
+
+        .featured-video-wrapper {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%;
+            background: #000;
+        }
+
+        .featured-video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .featured-info {
+            padding: 30px;
+            background: var(--white);
+        }
+
+        .featured-info h3 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .featured-info p {
+            font-size: 16px;
+            color: var(--text-secondary);
+        }
+
+        .hero h1 {
+            font-size: 56px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 16px;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        body.sky-blue-mode .hero h1 {
+            color: white;
+        }
+
+        .hero p {
+            font-size: 21px;
+            color: var(--text-secondary);
+            font-weight: 400;
+            animation: fadeInUp 0.8s ease-out 0.2s backwards;
+        }
+
+        body.sky-blue-mode .hero p {
+            color: white;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 60px 20px;
+        }
+
+        .category-section {
+            margin-bottom: 50px;
+            animation: fadeInUp 0.8s ease-out backwards;
+        }
+
+        .category-section:nth-child(1) { animation-delay: 0.1s; }
+        .category-section:nth-child(2) { animation-delay: 0.2s; }
+        .category-section:nth-child(3) { animation-delay: 0.3s; }
+        .category-section:nth-child(4) { animation-delay: 0.4s; }
+        .category-section:nth-child(5) { animation-delay: 0.5s; }
+        .category-section:nth-child(6) { animation-delay: 0.6s; }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        body.sky-blue-mode .category-header {
+            border-bottom-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .category-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--apple-blue);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-size: 20px;
+        }
+
+        .category-title {
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+
+        body.sky-blue-mode .category-title {
+            color: white;
+        }
+
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .video-card {
+            background: var(--white);
+            border-radius: 16px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .video-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .video-card.previewing {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0, 113, 227, 0.2);
+            border: 2px solid var(--apple-blue);
+        }
+
+        .video-thumbnail {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%;
+            background: var(--apple-gray);
+            overflow: hidden;
+        }
+
+        .video-thumbnail img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .thumbnail-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .video-card:hover .thumbnail-overlay {
+            opacity: 1;
+        }
+
+        .thumbnail-overlay span {
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .play-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .video-card:hover .play-button {
+            opacity: 1;
+        }
+
+        .play-button::after {
+            content: '';
+            width: 0;
+            height: 0;
+            border-left: 18px solid var(--apple-blue);
+            border-top: 12px solid transparent;
+            border-bottom: 12px solid transparent;
+            margin-left: 4px;
+        }
+
+        .video-info {
+            padding: 16px;
+        }
+
+        .video-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .video-channel {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 36px;
+            }
+
+            .hero p {
+                font-size: 18px;
+            }
+
+            .category-title {
+                font-size: 24px;
+            }
+
+            .video-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 16px;
+            }
+
+            .theme-toggle {
+                top: 10px;
+                right: 10px;
+            }
+
+            .theme-btn {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .video-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Theme Toggle Button -->
+    <div class="theme-toggle">
+        <button class="theme-btn" onclick="toggleTheme()">
+            <span id="themeIcon">☀️</span>
+            <span id="themeText">Sky Blue</span>
+        </button>
+    </div>
+
+    <!-- Featured Video Player -->
+    <div class="featured-player" id="featuredPlayer">
+        <div class="featured-container">
+            <div class="featured-close" onclick="closeFeaturedPlayer()">×</div>
+            <div class="featured-video-wrapper">
+                <iframe id="featuredIframe" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+            <div class="featured-info">
+                <h3 id="featuredTitle">Video Title</h3>
+                <p id="featuredChannel">Channel Name</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <div class="hero">
+        <h1>Content Hub</h1>
+        <p>Discover curated content across all categories</p>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Life Category -->
+        <div class="category-section">
+            <div class="category-header">
+                <div class="category-icon">🌱</div>
+                <h2 class="category-title">Life & Wellness</h2>
+            </div>
+            <div class="video-grid" id="life-grid"></div>
+        </div>
+
+        <!-- Business Category -->
+        <div class="category-section">
+            <div class="category-header">
+                <div class="category-icon">💼</div>
+                <h2 class="category-title">Business & Career</h2>
+            </div>
+            <div class="video-grid" id="business-grid"></div>
+        </div>
+
+        <!-- Entertainment Category -->
+        <div class="category-section">
+            <div class="category-header">
+                <div class="category-icon">🎬</div>
+                <h2 class="category-title">Entertainment</h2>
+            </div>
+            <div class="video-grid" id="entertainment-grid"></div>
+        </div>
+
+        <!-- Sports Category -->
+        <div class="category-section">
+            <div class="category-header">
+                <div class="category-icon">🏁</div>
+                <h2 class="category-title">Perspective</h2>
+            </div>
+            <div class="video-grid" id="sports-grid"></div>
+        </div>
+
+        <!-- News Category -->
+        <div class="category-section">
+            <div class="category-header">
+                <div class="category-icon">📰</div>
+                <h2 class="category-title">News & Current Affairs</h2>
+            </div>
+            <div class="video-grid" id="news-grid"></div>
+        </div>
+
+        <!-- Website Category -->
+        <div class="category-section">
+            <div class="category-header">
+                <div class="category-icon">🌐</div>
+                <h2 class="category-title">Websites</h2>
+            </div>
+            <div class="video-grid" id="website-grid"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentPreviewCard = null;
+        let hoverTimeout = null;
+
+        // Theme Toggle Function
+        function toggleTheme() {
+            const body = document.body;
+            const themeIcon = document.getElementById('themeIcon');
+            const themeText = document.getElementById('themeText');
+            
+            body.classList.toggle('sky-blue-mode');
+            
+            if (body.classList.contains('sky-blue-mode')) {
+                themeIcon.textContent = '🌙';
+                themeText.textContent = 'White Mode';
+                localStorage.setItem('theme', 'sky-blue');
+            } else {
+                themeIcon.textContent = '☀️';
+                themeText.textContent = 'Sky Blue';
+                localStorage.setItem('theme', 'white');
+            }
+        }
+
+        // Load saved theme preference on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'sky-blue') {
+                document.body.classList.add('sky-blue-mode');
+                document.getElementById('themeIcon').textContent = '🌙';
+                document.getElementById('themeText').textContent = 'White Mode';
+            }
+        });
+
+        // Content data organized by category
+        const content = {
+            life: [
+                { url: 'https://www.youtube.com/watch?v=DTUbR_l7V4A', title: 'The Power of Mindfulness in Daily Life', channel: 'Wellness Channel' },
+                { url: 'https://www.youtube.com/watch?v=0T_IvWjGSjA', title: 'Morning Routines That Changed My Life', channel: 'Lifestyle Insights' },
+                { url: 'https://www.youtube.com/watch?v=ycF8oZ8xwDY', title: 'Finding Balance in a Busy World', channel: 'Life Mastery' },
+                { url: 'https://www.youtube.com/watch?v=OV6cCmgXQg8', title: 'Personal Growth Journey', channel: 'Numeral Media' }
+            ],
+            business: [
+                { url: 'https://www.youtube.com/watch?v=Ftt1eujRuj4', title: 'Navigating Corporate Layoffs', channel: 'Business Insights' },
+                { url: 'https://www.youtube.com/watch?v=IloqutF6GiY', title: 'Career Transition Strategies', channel: 'Jay Reed' },
+                { url: 'https://www.youtube.com/watch?v=Tw7m0S4qFWw', title: 'Life After Layoff: What Next?', channel: 'Jay Reed' },
+                { url: 'https://www.youtube.com/watch?v=P4bP-Mz-ARc', title: 'Building Resilience in Uncertain Times', channel: 'Jay Reed' },
+                { url: 'https://www.youtube.com/watch?v=glns6GssyxM', title: 'Job Market Analysis 2025', channel: 'Jay Reed' },
+                { url: 'https://www.youtube.com/watch?v=2rsBLyB3BWk', title: 'Financial Planning After Job Loss', channel: 'FYDN' },
+                { url: 'https://www.youtube.com/watch?v=3R9qaiNshZo', title: 'Starting Over: A New Chapter', channel: 'Anton Daniels' }
+            ],
+            entertainment: [
+                { url: 'https://www.youtube.com/watch?v=UpYkvW56E9Q', title: 'Hollywood News & Updates', channel: 'Entertainment Tonight' },
+                { url: 'https://www.youtube.com/watch?v=VKq2flvS7dw', title: 'Music Industry Insights', channel: 'Music Central' },
+                { url: 'https://www.youtube.com/watch?v=ePXHj3qjZ5Q', title: 'Behind the Scenes: Movie Magic', channel: 'Cinema Secrets' },
+                { url: 'https://www.youtube.com/watch?v=ndagE_LEpKY', title: 'Pop Culture Commentary', channel: 'Kiki Chanel' },
+                { url: 'https://www.youtube.com/watch?v=DTHL5C7TiTg', title: 'Celebrity Interviews & More', channel: 'MG Charoudin' },
+                { url: 'https://www.youtube.com/watch?v=Wq0fvxRswww', title: 'Entertainment World Explored', channel: 'Twomad' },
+                { url: 'https://www.youtube.com/watch?v=C2xrtMRsrWM', title: 'Automotive Entertainment', channel: 'Good Car' }
+            ],
+            sports: [
+                { url: 'https://www.youtube.com/watch?v=8XezrgNzwEA', title: 'Game Day Highlights', channel: 'Sports Network' },
+                { url: 'https://www.youtube.com/watch?v=VeMA9WGKxOg', title: 'A New Day After 25 Years: Life After Layoff', channel: 'Personal Stories' },
+                { url: 'https://www.youtube.com/watch?v=NWZKuueumJE', title: 'Expert Sports Analysis', channel: 'Sports Breakdown' },
+                { url: 'https://www.youtube.com/watch?v=wvc9MBph0Zo', title: 'Championship Moments Revisited', channel: 'Classic Sports' },
+                { url: 'https://www.youtube.com/watch?v=YN6BEUA4jNU', title: 'This Week in Sports', channel: 'Sports Weekly' }
+            ],
+            news: [
+                { url: 'https://www.youtube.com/watch?v=xOuhoIWjyrw', title: 'Breaking News Today', channel: 'Global News Network' },
+                { url: 'https://www.youtube.com/watch?v=u0rd7u88dAg', title: 'World News Roundup', channel: 'World Report' },
+                { url: 'https://www.youtube.com/watch?v=4gqRpVtX1SQ', title: 'Daily News Update', channel: 'News Central' },
+                { url: 'https://www.youtube.com/watch?v=rVKIGulvVhg', title: 'Commentary & Analysis', channel: 'Brit Rants' }
+            ],
+            website: [
+                { url: 'https://www.landtop.com.tw/', title: 'Landtop', channel: 'Official Website' },
+                { url: 'https://www.showba.com.tw/', title: 'Showba', channel: 'Official Website' }
+            ]
+        };
+
+        // Function to extract YouTube video ID
+        function getYouTubeID(url) {
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
+        // Function to open featured player
+        function openFeaturedPlayer(videoId, title, channel, cardElement) {
+            if (!videoId) return; // Safety check
+            
+            const player = document.getElementById('featuredPlayer');
+            const iframe = document.getElementById('featuredIframe');
+            const titleElement = document.getElementById('featuredTitle');
+            const channelElement = document.getElementById('featuredChannel');
+
+            // Update content
+            iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+            titleElement.textContent = title;
+            channelElement.textContent = channel;
+
+            // Show player
+            player.classList.add('active');
+
+            // Scroll to player smoothly
+            setTimeout(() => {
+                player.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+
+            // Highlight current card
+            if (currentPreviewCard) {
+                currentPreviewCard.classList.remove('previewing');
+            }
+            currentPreviewCard = cardElement;
+            cardElement.classList.add('previewing');
+        }
+
+        // Function to close featured player
+        function closeFeaturedPlayer() {
+            const player = document.getElementById('featuredPlayer');
+            const iframe = document.getElementById('featuredIframe');
+            
+            player.classList.remove('active');
+            iframe.src = '';
+
+            if (currentPreviewCard) {
+                currentPreviewCard.classList.remove('previewing');
+                currentPreviewCard = null;
+            }
+        }
+
+        // Function to preview on hover
+        function previewVideo(videoId, title, channel, cardElement) {
+            if (!videoId || hoverTimeout) {
+                if (hoverTimeout) clearTimeout(hoverTimeout);
+            }
+
+            hoverTimeout = setTimeout(() => {
+                openFeaturedPlayer(videoId, title, channel, cardElement);
+            }, 800); // Wait 800ms before showing preview
+        }
+
+        // Function to cancel preview
+        function cancelPreview() {
+            if (hoverTimeout) {
+                clearTimeout(hoverTimeout);
+                hoverTimeout = null;
+            }
+        }
+
+        // Function to create video card
+        function createVideoCard(item, index) {
+            const videoId = getYouTubeID(item.url);
+            
+            // Handle regular websites (non-YouTube)
+            if (!videoId) {
+                const cardId = `website-card-${index}`;
+                const safeTitle = item.title.replace(/`/g, '&#96;').replace(/"/g, '&quot;');
+                const safeChannel = item.channel.replace(/`/g, '&#96;').replace(/"/g, '&quot;');
+                const safeUrl = item.url.replace(/"/g, '&quot;');
+                
+                return `
+                    <div class="video-card" id="${cardId}" 
+                         onclick="window.open('${safeUrl}', '_blank');" style="cursor: pointer;">
+                        <div class="video-thumbnail">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='225'%3E%3Crect fill='%23f5f5f7' width='400' height='225'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial' font-size='40' fill='%230071e3' text-anchor='middle' dominant-baseline='middle'%3E🌐%3C/text%3E%3C/svg%3E" alt="${safeTitle}">
+                            <div class="thumbnail-overlay">
+                                <span>🔗 Visit Website</span>
+                            </div>
+                        </div>
+                        <div class="video-info">
+                            <div class="video-title">${item.title}</div>
+                            <div class="video-channel">${item.channel}</div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+            const cardId = `video-card-${index}`;
+            const safeTitle = item.title.replace(/`/g, '&#96;').replace(/"/g, '&quot;');
+            const safeChannel = item.channel.replace(/`/g, '&#96;').replace(/"/g, '&quot;');
+
+            return `
+                <div class="video-card" id="${cardId}" 
+                     onmouseenter="previewVideo('${videoId}', \`${safeTitle}\`, '${safeChannel}', document.getElementById('${cardId}'))"
+                     onmouseleave="cancelPreview()"
+                     onclick="event.stopPropagation(); openFeaturedPlayer('${videoId}', \`${safeTitle}\`, '${safeChannel}', document.getElementById('${cardId}'));">
+                    <div class="video-thumbnail">
+                        <img src="${thumbnailUrl}" alt="${item.title}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22225%22%3E%3Crect fill=%22%23f5f5f7%22 width=%22400%22 height=%22225%22/%3E%3C/svg%3E'">
+                        <div class="thumbnail-overlay">
+                            <span>▶ Click to watch</span>
+                        </div>
+                        <div class="play-button"></div>
+                    </div>
+                    <div class="video-info">
+                        <div class="video-title">${item.title}</div>
+                        <div class="video-channel">${item.channel}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Populate each category
+        document.getElementById('life-grid').innerHTML = content.life.map((item, i) => createVideoCard(item, `life-${i}`)).join('');
+        document.getElementById('business-grid').innerHTML = content.business.map((item, i) => createVideoCard(item, `business-${i}`)).join('');
+        document.getElementById('entertainment-grid').innerHTML = content.entertainment.map((item, i) => createVideoCard(item, `entertainment-${i}`)).join('');
+        document.getElementById('sports-grid').innerHTML = content.sports.map((item, i) => createVideoCard(item, `sports-${i}`)).join('');
+        document.getElementById('news-grid').innerHTML = content.news.map((item, i) => createVideoCard(item, `news-${i}`)).join('');
+        document.getElementById('website-grid').innerHTML = content.website.map((item, i) => createVideoCard(item, `website-${i}`)).join('');
+    </script>
+</body>
+</html>
